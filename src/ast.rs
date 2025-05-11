@@ -398,14 +398,18 @@ pub enum Expr {
 
 impl Expr {
     pub fn parse_radixint(s: &str) -> Result<Int, String> {
-        if let Some(num) = s.strip_prefix("0b") {
-            Int::from_str_radix(num, 2).map_err(|e| e.to_string())
-        } else if let Some(num) = s.strip_prefix("0o") {
-            Int::from_str_radix(num, 8).map_err(|e| e.to_string())
-        } else if let Some(num) = s.strip_prefix("0d") {
-            Int::from_str_radix(num, 10).map_err(|e| e.to_string())
-        } else if let Some(num) = s.strip_prefix("0h") {
-            Int::from_str_radix(num, 16).map_err(|e| e.to_string())
+        if let Some(x) = s.strip_suffix("\"") {
+            if let Some(num) = x.strip_prefix("\"b") {
+                Int::from_str_radix(num, 2).map_err(|e| e.to_string())
+            } else if let Some(num) = x.strip_prefix("\"o") {
+                Int::from_str_radix(num, 8).map_err(|e| e.to_string())
+            } else if let Some(num) = x.strip_prefix("\"d") {
+                Int::from_str_radix(num, 10).map_err(|e| e.to_string())
+            } else if let Some(num) = x.strip_prefix("\"h") {
+                Int::from_str_radix(num, 16).map_err(|e| e.to_string())
+            } else {
+                Err(format!("Invalid number format: {}", s))
+            }
         } else {
             Err(format!("Invalid number format: {}", s))
         }

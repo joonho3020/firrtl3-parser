@@ -265,6 +265,9 @@ pub enum Token {
     #[token("=>")]
     SetValue,
 
+    #[token("with")]
+    With,
+
     #[token("public")]
     Public,
 

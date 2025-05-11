@@ -87,7 +87,9 @@ extern {
     "FIRRTL"           => Token::FIRRTL,
     "version"          => Token::Version,
     "circuit"          => Token::Circuit,
-    "connect"          => Token::Connect,
+    "<="               => Token::Connect,
+    "=>"               => Token::SetValue,
+    "with"             => Token::With,
     "public"           => Token::Public,
     "define"           => Token::Define,
     "const"            => Token::Const,
@@ -195,10 +197,10 @@ pub Exprs: ast::Exprs = {
 pub Expr: ast::Expr = {
     <u: "uint"> <w: Width> "(" ")" => ast::Expr::UIntNoInit(w),
     <u: "uint"> <w: Width> "(" <i: "int"> ")" => ast::Expr::UIntInit(w, i),
-    <u: "uint"> <w: Width> "(" <ri: "radixint"> ")" => ast::Expr::UIntInit(w, ast::Expr::parse_radixint(&ri).expect("parse_radixint")),
+    <u: "uint"> <w: Width> "(" <ri: "string"> ")" => ast::Expr::UIntInit(w, ast::Expr::parse_radixint(&ri).expect("parse_radixint")),
     <s: "sint"> <w: Width> "(" ")" => ast::Expr::SIntNoInit(w),
     <s: "sint"> <w: Width> "(" <i: "int"> ")" => ast::Expr::SIntInit(w, i),
-    <s: "sint"> <w: Width> "(" <ri: "radixint"> ")" => ast::Expr::SIntInit(w, ast::Expr::parse_radixint(&ri).expect("parse_radixint")),
+    <s: "sint"> <w: Width> "(" <ri: "string"> ")" => ast::Expr::SIntInit(w, ast::Expr::parse_radixint(&ri).expect("parse_radixint")),
     <r: Reference> => ast::Expr::Reference(r),
     <m: "mux"> "(" <sel: Expr> "symbol" <exp_true: Expr> "symbol" <exp_false: Expr> ")" => ast::Expr::Mux(Box::new(sel), Box::new(exp_true), Box::new(exp_false)),
     <vif: "validif"> "(" <if_expr: Expr> "symbol" <expr: Expr> ")" => ast::Expr::ValidIf(Box::new(if_expr), Box::new(expr)),
@@ -257,11 +259,22 @@ pub Stmts: ast::Stmts = {
 pub Stmt: ast::Stmt = {
   "wire" <name: Identifier> "symbol" <tpe: Type> <info: Info> => ast::Stmt::Wire(name, tpe, info),
   "wire" <name: Identifier> "symbol" <tpe: Type>              => ast::Stmt::Wire(name, tpe, ast::Info::default()),
-  "reg" <name: Identifier> "symbol" <tpe: Type> "symbol" <clk: Expr> <info: Info> => ast::Stmt::Reg(name, tpe, clk, info),
-  "reg" <name: Identifier> "symbol" <tpe: Type> "symbol" <clk: Expr>              => ast::Stmt::Reg(name, tpe, clk, ast::Info::default()),
-  "reg_reset" <name: Identifier> "symbol" <tpe: Type> "symbol" <clk: Expr> "symbol" <rst: Expr> "symbol" <init: Expr> <info: Info> => ast::Stmt::RegReset(name, tpe, clk, rst, init, info),
-  "reg_reset" <name: Identifier> "symbol" <tpe: Type> "symbol" <clk: Expr> "symbol" <rst: Expr> "symbol" <init: Expr>              => ast::Stmt::RegReset(name, tpe, clk, rst, init, ast::Info::default()),
-
+  "reg" <name: Identifier> "symbol" <tpe: Type> "symbol" <clk: Expr> "with" "symbol" "indent" <reset: Identifier> "=>" "(" <reset_cond: Expr> "symbol" <reset_val: Expr> ")" <info: Info> "dedent" => {
+    let rst_expr = ast::Expr::Reference(ast::Reference::Ref(reset.clone()));
+    if rst_expr == reset_cond {
+      ast::Stmt::RegReset(name, tpe, clk, reset_cond, reset_val, info)
+    } else {
+      ast::Stmt::Reg(name, tpe, clk, info)
+    }
+  },
+  "reg" <name: Identifier> "symbol" <tpe: Type> "symbol" <clk: Expr> "with" "symbol" "indent" <reset: Identifier> "=>" "(" <reset_cond: Expr> "symbol" <reset_val: Expr> ")"              "dedent" => {
+    let rst_expr = ast::Expr::Reference(ast::Reference::Ref(reset.clone()));
+    if rst_expr == reset_cond {
+      ast::Stmt::RegReset(name, tpe, clk, reset_cond, reset_val, ast::Info::default())
+    } else {
+      ast::Stmt::Reg(name, tpe, clk, ast::Info::default())
+    }
+  },
   <m: ChirrtlMemory> => ast::Stmt::ChirrtlMemory(m),
   <mp: ChirrtlMemoryPort> => ast::Stmt::ChirrtlMemoryPort(mp),
 
@@ -274,8 +287,8 @@ pub Stmt: ast::Stmt = {
   // TODO: add all other primop cases
   // "node" <name: "primop_e1i1"> "symbol" <expr: Expr> <info: Info> => ast::Stmt::Node(ast::Identifier::Name(name), expr, info),
 
-  "connect" <sink: Expr> "symbol" <driver: Expr> <info: Info> => ast::Stmt::Connect(sink, driver, info),
-  "connect" <sink: Expr> "symbol" <driver: Expr>              => ast::Stmt::Connect(sink, driver, ast::Info::default()),
+  <sink: Expr> "<=" <driver: Expr> <info: Info> => ast::Stmt::Connect(sink, driver, info),
+  <sink: Expr> "<=" <driver: Expr>              => ast::Stmt::Connect(sink, driver, ast::Info::default()),
   "invalidate" <exp: Expr> <info: Info> => ast::Stmt::Invalidate(exp, info),
   "invalidate" <exp: Expr>              => ast::Stmt::Invalidate(exp, ast::Info::default()),
 
@@ -317,6 +330,8 @@ pub Port: ast::Port = {
 pub Module: ast::Module = {
              "module" <name: Identifier> "symbol" <info: Info> "indent" <ports: Ports> <stmts: Stmts> "dedent" => ast::Module::new(name, ports, stmts, info),
     "public" "module" <name: Identifier> "symbol" <info: Info> "indent" <ports: Ports> <stmts: Stmts> "dedent" => ast::Module::new(name, ports, stmts, info),
+             "module" <name: Identifier> "symbol"              "indent" <ports: Ports> <stmts: Stmts> "dedent" => ast::Module::new(name, ports, stmts, ast::Info::default()),
+    "public" "module" <name: Identifier> "symbol"              "indent" <ports: Ports> <stmts: Stmts> "dedent" => ast::Module::new(name, ports, stmts, ast::Info::default()),
 };
 
 pub DefName: ast::DefName = {
