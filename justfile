@@ -2,12 +2,14 @@
 test_inputs_dir := "test-inputs"
 test_outputs_dir := "test-outputs"
 test_inputs_tar := "test-inputs.tar.gz"
-firesim_modules_dir := test_inputs_dir + "/" + "firesim"
+firesim_rocket_modules_dir := test_inputs_dir + "/" + "firesim_rocket"
+firesim_boom_modules_dir := test_inputs_dir + "/" + "firesim_boom"
 
 [group: 'test']
 uncompress:
   tar -xvzf {{test_inputs_tar}}
-  python scripts/firrtl-module-splitter.py {{test_inputs_dir}}/FireSim.fir  {{firesim_modules_dir}}
+  python scripts/firrtl-module-splitter.py {{test_inputs_dir}}/FireSimRocket.fir  {{firesim_rocket_modules_dir}}
+  python scripts/firrtl-module-splitter.py {{test_inputs_dir}}/FireSimLargeBoom.fir  {{firesim_boom_modules_dir}}
 
 [group: 'test']
 make_output_dir:
@@ -31,7 +33,8 @@ list:
 
 [group: 'test']
 repackage_test_inputs:
-  rm -rf {{firesim_modules_dir}}
+  rm -rf {{firesim_rocket_modules_dir}}
+  rm -rf {{firesim_boom_modules_dir}}
   rm {{test_inputs_tar}}
   tar -cvzf {{test_inputs_tar}} {{test_inputs_dir}}
 

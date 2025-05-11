@@ -38,7 +38,8 @@ mod lexer_test {
     #[test_case("WireRegInsideWhen" ; "WireRegInsideWhen")]
     #[test_case("MultiWhen" ; "MultiWhen")]
     #[test_case("Cache" ; "Cache")]
-    #[test_case("FireSim" ; "FireSim")]
+    #[test_case("FireSimRocket" ; "FireSimRocket")]
+    #[test_case("FireSimLargeBoom" ; "FireSimLargeBoom")]
     fn run(input: &str) -> Result<(), std::io::Error> {
         let source = std::fs::read_to_string(&format!("./test-inputs/{}.fir", input))?;
         run_lexer(&source);
