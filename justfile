@@ -7,7 +7,7 @@ firesim_modules_dir := test_inputs_dir + "/" + "firesim"
 [group: 'test']
 uncompress:
   tar -xvzf {{test_inputs_tar}}
-  python scripts/firrtl-module-splitter.py {{test_inputs_dir}}/post-readback.fir  {{firesim_modules_dir}}
+  python scripts/firrtl-module-splitter.py {{test_inputs_dir}}/FireSim.fir  {{firesim_modules_dir}}
 
 [group: 'test']
 make_output_dir:
