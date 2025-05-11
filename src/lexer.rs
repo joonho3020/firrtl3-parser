@@ -259,8 +259,11 @@ pub enum Token {
     #[token("circuit")]
     Circuit,
 
-    #[token("connect")]
+    #[token("<=")]
     Connect,
+
+    #[token("=>")]
+    SetValue,
 
     #[token("public")]
     Public,
