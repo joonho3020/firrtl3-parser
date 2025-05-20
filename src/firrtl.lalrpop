@@ -238,8 +238,11 @@ pub ChirrtlMemory: ast::ChirrtlMemory = {
 
 pub ChirrtlMemoryPort: ast::ChirrtlMemoryPort = {
     "write" "mport" <name: Identifier> "symbol" <mem_ref: Identifier> "[" <addr_ref: Expr> "]" "symbol" <clk_ref: Reference> <info: Info> => ast::ChirrtlMemoryPort::Write(name, mem_ref, addr_ref, clk_ref, info),
+    "write" "mport" <name: Identifier> "symbol" <mem_ref: Identifier> "[" <addr_ref: Expr> "]" "symbol" <clk_ref: Reference>              => ast::ChirrtlMemoryPort::Write(name, mem_ref, addr_ref, clk_ref, ast::Info::default()),
     "read"  "mport" <name: Identifier> "symbol" <mem_ref: Identifier> "[" <addr_ref: Expr> "]" "symbol" <clk_ref: Reference> <info: Info> => ast::ChirrtlMemoryPort::Read(name, mem_ref, addr_ref, clk_ref, info),
+    "read"  "mport" <name: Identifier> "symbol" <mem_ref: Identifier> "[" <addr_ref: Expr> "]" "symbol" <clk_ref: Reference>              => ast::ChirrtlMemoryPort::Read(name, mem_ref, addr_ref, clk_ref, ast::Info::default()),
     "infer" "mport" <name: Identifier> "symbol" <mem_ref: Identifier> "[" <addr_ref: Expr> "]" "symbol" <clk_ref: Reference> <info: Info> => ast::ChirrtlMemoryPort::Infer(name, mem_ref, addr_ref, clk_ref, info),
+    "infer" "mport" <name: Identifier> "symbol" <mem_ref: Identifier> "[" <addr_ref: Expr> "]" "symbol" <clk_ref: Reference>              => ast::ChirrtlMemoryPort::Infer(name, mem_ref, addr_ref, clk_ref, ast::Info::default()),
 }
 
 // pub Refs = Comma<Ref>;

@@ -57,12 +57,12 @@ reg x : UInt, clock with :
      #[test_case("RegVecInit" ; "RegVecInit")]
      #[test_case("Subtracter" ; "Subtracter")]
      #[test_case("Top" ; "Top")]
-// #[test_case("SinglePortSRAM" ; "SinglePortSRAM")]
-// #[test_case("Cache" ; "Cache")]
-// #[test_case("DualReadSingleWritePortSRAM" ; "DualReadSingleWritePortSRAM")]
-// #[test_case("OneReadOneReadWritePortSRAM" ; "OneReadOneReadWritePortSRAM")]
-// #[test_case("OneReadOneWritePortSRAM" ; "OneReadOneWritePortSRAM")]
-// #[test_case("PointerChasing" ; "PointerChasing")]
+     #[test_case("SinglePortSRAM" ; "SinglePortSRAM")]
+     #[test_case("DualReadSingleWritePortSRAM" ; "DualReadSingleWritePortSRAM")]
+     #[test_case("OneReadOneReadWritePortSRAM" ; "OneReadOneReadWritePortSRAM")]
+     #[test_case("OneReadOneWritePortSRAM" ; "OneReadOneWritePortSRAM")]
+     #[test_case("Cache" ; "Cache")]
+     #[test_case("PointerChasing" ; "PointerChasing")]
      fn run(name: &str) -> Result<(), std::io::Error> {
          let file = format!("./test-inputs/{}.fir", name);
          let source = std::fs::read_to_string(&file)?;
