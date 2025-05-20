@@ -1,6 +1,7 @@
 
 #[cfg(test)]
 mod parser_test {
+    use test_case::test_case;
     use firrtl3_parser::lexer::*;
     use firrtl3_parser::firrtl::*;
 
@@ -31,9 +32,40 @@ reg x : UInt, clock with :
          println!("{:?}", ast);
      }
 
-     #[test]
-     fn gcd() -> Result<(), std::io::Error> {
-         let source = std::fs::read_to_string("./test-inputs/GCD.fir")?;
+     #[test_case("Adder" ; "Adder")]
+     #[test_case("GCD" ; "GCD")]
+     #[test_case("GCDDelta" ; "GCDDelta")]
+     #[test_case("Fir" ; "Fir")]
+     #[test_case("BitSel1" ; "BitSel1")]
+     #[test_case("BitSel2" ; "BitSel2")]
+     #[test_case("LCS1" ; "LCS1")]
+     #[test_case("LCS2" ; "LCS2")]
+     #[test_case("LCS3" ; "LCS3")]
+     #[test_case("LCS4" ; "LCS4")]
+     #[test_case("LCS5" ; "LCS5")]
+     #[test_case("LCS6" ; "LCS6")]
+     #[test_case("LCS7" ; "LCS7")]
+     #[test_case("LCS8" ; "LCS8")]
+     #[test_case("CombHierarchy" ; "CombHierarchy")]
+     #[test_case("DecoupledMux" ; "DecoupledMux")]
+     #[test_case("DynamicIndexing" ; "DynamicIndexing")]
+     #[test_case("MultiWhen" ; "MultiWhen")]
+     #[test_case("MyQueue" ; "MyQueue")]
+     #[test_case("NestedWhen" ; "NestedWhen")]
+     #[test_case("RegFile" ; "RegFile")]
+     #[test_case("RegInitWire" ; "RegInitWire")]
+     #[test_case("RegVecInit" ; "RegVecInit")]
+     #[test_case("Subtracter" ; "Subtracter")]
+     #[test_case("Top" ; "Top")]
+// #[test_case("SinglePortSRAM" ; "SinglePortSRAM")]
+// #[test_case("Cache" ; "Cache")]
+// #[test_case("DualReadSingleWritePortSRAM" ; "DualReadSingleWritePortSRAM")]
+// #[test_case("OneReadOneReadWritePortSRAM" ; "OneReadOneReadWritePortSRAM")]
+// #[test_case("OneReadOneWritePortSRAM" ; "OneReadOneWritePortSRAM")]
+// #[test_case("PointerChasing" ; "PointerChasing")]
+     fn run(name: &str) -> Result<(), std::io::Error> {
+         let file = format!("./test-inputs/{}.fir", name);
+         let source = std::fs::read_to_string(&file)?;
          let lexer = FIRRTLLexer::new(&source);
          let parser = CircuitParser::new();
          let _ast = parser.parse(lexer).expect("FAILED");

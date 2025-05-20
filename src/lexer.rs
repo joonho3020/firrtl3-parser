@@ -202,7 +202,10 @@ pub enum Token {
     #[token("node")]
     Node,
 
-    #[token("invalidate")]
+    #[token("is")]
+    Is,
+
+    #[token("invalid")]
     Invalidate,
 
     #[token("attach")]
