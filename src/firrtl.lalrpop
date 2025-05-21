@@ -380,6 +380,8 @@ pub Parameters: ast::Parameters = {
 pub ExtModule: ast::ExtModule = {
     "extmodule" <name: Identifier> "symbol" <info: Info> "indent" <ports: Ports> <defname: DefName> <params: Parameters> "dedent" => ast::ExtModule::new(name, ports, defname, params, info),
     "extmodule" <name: Identifier> "symbol" <info: Info> "indent" <ports: Ports> <defname: DefName>                      "dedent" => ast::ExtModule::new(name, ports, defname, vec![], info),
+    "extmodule" <name: Identifier> "symbol"              "indent" <ports: Ports> <defname: DefName> <params: Parameters> "dedent" => ast::ExtModule::new(name, ports, defname, params, ast::Info::default()),
+    "extmodule" <name: Identifier> "symbol"              "indent" <ports: Ports> <defname: DefName>                      "dedent" => ast::ExtModule::new(name, ports, defname, vec![], ast::Info::default()),
 };
 
 pub Annotations: ast::Annotations = {
