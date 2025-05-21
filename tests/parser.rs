@@ -32,6 +32,50 @@ reg x : UInt, clock with :
          println!("{:?}", ast);
      }
 
+     #[test]
+     fn printf_stmt() {
+         let source =
+             r#"
+printf(clock, _GEN_6, "Assertion failed\n    at Arbiter.scala:77 assert((prefixOR zip winner) map { case (p,w) => !p || !w } reduce {_ && _})\n") : printf @[generators/rocket-chip/src/main/scala/tilelink/Arbiter.scala 77:13]
+"#;
+         let lexer = FIRRTLLexer::new(source);
+         let parser = StmtParser::new();
+         let ast = parser.parse(lexer).unwrap();
+         println!("{:?}", ast);
+     }
+
+     #[test]
+     fn stop_stmt() {
+         let source =
+             r#"
+stop(clock, _GEN_6, 1) : assert @[generators/rocket-chip/src/main/scala/tilelink/Arbiter.scala 77:13]
+"#;
+         let lexer = FIRRTLLexer::new(source);
+         let parser = StmtParser::new();
+         let ast = parser.parse(lexer).unwrap();
+         println!("{:?}", ast);
+     }
+
+     #[test]
+     fn mem_stmt() {
+         let source =
+             r#"
+mem ram_flattened : @[src/main/scala/chisel3/util/Decoupled.scala 256:91]
+  data-type => UInt<118>
+  depth => 2
+  read-latency => 0
+  write-latency => 1
+  reader => io_deq_bits_MPORT
+  writer => MPORT
+  read-under-write => undefined
+
+"#;
+         let lexer = FIRRTLLexer::new(source);
+         let parser = StmtParser::new();
+         let ast = parser.parse(lexer).unwrap();
+         println!("{:?}", ast);
+     }
+
      #[test_case("Adder" ; "Adder")]
      #[test_case("GCD" ; "GCD")]
      #[test_case("GCDDelta" ; "GCDDelta")]
@@ -63,6 +107,7 @@ reg x : UInt, clock with :
      #[test_case("OneReadOneWritePortSRAM" ; "OneReadOneWritePortSRAM")]
      #[test_case("Cache" ; "Cache")]
      #[test_case("PointerChasing" ; "PointerChasing")]
+     #[test_case("FireSimRocket" ; "FireSimRocket")]
      fn run(name: &str) -> Result<(), std::io::Error> {
          let file = format!("./test-inputs/{}.fir", name);
          let source = std::fs::read_to_string(&file)?;

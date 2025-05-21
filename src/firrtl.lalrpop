@@ -51,6 +51,7 @@ extern {
     "primop_e1i2"      => Token::E1I2Op(<String>),
     "mux"              => Token::Mux,
     "validif"          => Token::ValidIf,
+    "mem"              => Token::Mem,
     "smem"             => Token::SMem,
     "cmem"             => Token::CMem,
     "write"            => Token::Write,
@@ -62,6 +63,9 @@ extern {
     "read_lat"         => Token::ReadLatency,
     "write_lat"        => Token::WriteLatency,
     "read_under_write" => Token::ReadUnderWrite,
+    "reader"           => Token::Reader,
+    "writer"           => Token::Writer,
+    "readwriter"       => Token::ReadWriter,
     "wire"             => Token::Wire,
     "reg"              => Token::Reg,
     "reg_reset"        => Token::RegReset,
@@ -222,6 +226,8 @@ pub ChirrtlMemoryDataType: ast::Type = {
 
 pub ChirrtlMemoryReadUnderWrite: ast::ChirrtlMemoryReadUnderWrite = {
     // FIXME: Properly set this flag
+    "read_under_write" "=>" <ruw: Identifier> => ast::ChirrtlMemoryReadUnderWrite::default(),
+    "read_under_write" "=>" <ruw: "string"> => ast::ChirrtlMemoryReadUnderWrite::default(),
     "read_under_write" => ast::ChirrtlMemoryReadUnderWrite::default(),
 };
 
@@ -243,6 +249,17 @@ pub ChirrtlMemoryPort: ast::ChirrtlMemoryPort = {
     "read"  "mport" <name: Identifier> "symbol" <mem_ref: Identifier> "[" <addr_ref: Expr> "]" "symbol" <clk_ref: Reference>              => ast::ChirrtlMemoryPort::Read(name, mem_ref, addr_ref, clk_ref, ast::Info::default()),
     "infer" "mport" <name: Identifier> "symbol" <mem_ref: Identifier> "[" <addr_ref: Expr> "]" "symbol" <clk_ref: Reference> <info: Info> => ast::ChirrtlMemoryPort::Infer(name, mem_ref, addr_ref, clk_ref, info),
     "infer" "mport" <name: Identifier> "symbol" <mem_ref: Identifier> "[" <addr_ref: Expr> "]" "symbol" <clk_ref: Reference>              => ast::ChirrtlMemoryPort::Infer(name, mem_ref, addr_ref, clk_ref, ast::Info::default()),
+}
+
+pub MemoryPort: ast::MemoryPort = {
+    "writer"     "=>" <name: Identifier> => ast::MemoryPort::Write(name),
+    "reader"     "=>" <name: Identifier> => ast::MemoryPort::Read(name),
+    "readwriter" "=>" <name: Identifier> => ast::MemoryPort::ReadWrite(name),
+}
+
+pub MemoryPorts: ast::MemoryPorts = {
+    <mut head: MemoryPorts> <tail: MemoryPort> => { head.push(Box::new(tail)); head } ,
+    <head: MemoryPort> => vec![Box::new(head)],
 }
 
 // pub Refs = Comma<Ref>;
@@ -317,6 +334,13 @@ pub Stmt: ast::Stmt = {
 
   "skip"              => ast::Stmt::Skip(ast::Info::default()),
   "skip" <info: Info> => ast::Stmt::Skip(info),
+
+  "stop" "(" <clk: Expr> "symbol" <cond: Expr> "symbol" <x: "int"> ")" "symbol" <name: Identifier>              => ast::Stmt::Stop(name, clk, cond, x, ast::Info::default()),
+  "stop" "(" <clk: Expr> "symbol" <cond: Expr> "symbol" <x: "int"> ")" "symbol" <name: Identifier> <info: Info> => ast::Stmt::Stop(name, clk, cond, x, info),
+
+  "mem" <name: Identifier> "symbol" <info: Info> "indent" "datatype" "=>" <tpe: Type> "depth" "=>" <depth: "int"> "read_lat" "=>" <rd_lat: "int"> "write_lat" "=>" <wr_lat: "int"> <ports: MemoryPorts> <ruw: ChirrtlMemoryReadUnderWrite> "dedent" => {
+      ast::Stmt::Memory(tpe, depth.to_u32(), rd_lat.to_u32(), wr_lat.to_u32(), ports, ruw, info)
+  },
 };
 
 pub Ports: ast::Ports = {

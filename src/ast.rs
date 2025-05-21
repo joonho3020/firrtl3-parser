@@ -601,6 +601,15 @@ impl Display for ChirrtlMemoryPort {
 pub type Stmts = Vec<Box<Stmt>>;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
+pub enum MemoryPort {
+    Write(Identifier),
+    Read(Identifier),
+    ReadWrite(Identifier),
+}
+
+pub type MemoryPorts = Vec<Box<MemoryPort>>;
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub enum Stmt {
     Skip(Info),
     Wire(Identifier, Type, Info),
@@ -615,8 +624,8 @@ pub enum Stmt {
     When(Expr, Info, Stmts, Option<Stmts>),
     Printf(Option<Identifier>, Expr, Expr, String, Option<Exprs>, Info),
     Assert(Option<Identifier>, Expr, Expr, Expr, String, Info),
-// Memory()
-// Stop(Expr, Expr, u64, Info),
+    Stop(Identifier, Expr, Expr, Int, Info),
+    Memory(Type, u32, u32, u32, MemoryPorts, ChirrtlMemoryReadUnderWrite, Info),
 // Stop(Expr, Expr, u64, Info),
 // Define(Define, Reference, Probe, Info),
 // Define(Define, Reference, Expr, Probe, Info),
@@ -700,6 +709,12 @@ impl Display for Stmt {
                     }
                 }
                 Ok(())
+            }
+            Stmt::Stop(name, clk, cond, x, info) => {
+                writeln!(f, "stop({}, {}, {}) : {} {}", clk, cond, x, name, info)
+            }
+            Stmt::Memory(tpe, depth, rlat, wlat, ports, ruw, info) => {
+                unimplemented!();
             }
         }
     }
