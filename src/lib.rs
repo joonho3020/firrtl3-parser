@@ -1,7 +1,6 @@
-pub mod ast;
 pub mod lexer;
 
-use crate::ast::Circuit;
+use rusty_firrtl::Circuit;
 use crate::firrtl::*;
 use crate::lexer::{FIRRTLLexer, Token, LexicalError};
 use lalrpop_util::{lalrpop_mod, ParseError};
