@@ -156,6 +156,7 @@ pub Identifier: rusty_firrtl::Identifier = {
     "assert"      => rusty_firrtl::Identifier::Name("assert".to_string()),
     "smem"        => rusty_firrtl::Identifier::Name("smem".to_string()),
     "cmem"        => rusty_firrtl::Identifier::Name("cmem".to_string()),
+    "mem"         => rusty_firrtl::Identifier::Name("mem".to_string()),
     "of"          => rusty_firrtl::Identifier::Name("of".to_string()),
     "reg"         => rusty_firrtl::Identifier::Name("reg".to_string()),
     "input"       => rusty_firrtl::Identifier::Name("input".to_string()),
