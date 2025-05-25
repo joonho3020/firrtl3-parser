@@ -339,7 +339,7 @@ pub Stmt: rusty_firrtl::Stmt = {
   "stop" "(" <clk: Expr> "symbol" <cond: Expr> "symbol" <x: "int"> ")" "symbol" <name: Identifier> <info: Info> => rusty_firrtl::Stmt::Stop(name, clk, cond, x, info),
 
   "mem" <name: Identifier> "symbol" <info: Info> "indent" "datatype" "=>" <tpe: Type> "depth" "=>" <depth: "int"> "read_lat" "=>" <rd_lat: "int"> "write_lat" "=>" <wr_lat: "int"> <ports: MemoryPorts> <ruw: ChirrtlMemoryReadUnderWrite> "dedent" => {
-      rusty_firrtl::Stmt::Memory(tpe, depth.to_u32(), rd_lat.to_u32(), wr_lat.to_u32(), ports, ruw, info)
+      rusty_firrtl::Stmt::Memory(name, tpe, depth.to_u32(), rd_lat.to_u32(), wr_lat.to_u32(), ports, ruw, info)
   },
 };
 
