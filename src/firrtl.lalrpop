@@ -281,19 +281,25 @@ pub Stmt: rusty_firrtl::Stmt = {
   "wire" <name: Identifier> "symbol" <tpe: Type> <info: Info> => rusty_firrtl::Stmt::Wire(name, tpe, info),
   "wire" <name: Identifier> "symbol" <tpe: Type>              => rusty_firrtl::Stmt::Wire(name, tpe, rusty_firrtl::Info::default()),
   "reg" <name: Identifier> "symbol" <tpe: Type> "symbol" <clk: Expr> "with" "symbol" "indent" <reset: Identifier> "=>" "(" <reset_cond: Expr> "symbol" <reset_val: Expr> ")" <info: Info> "dedent" => {
-    let rst_expr = rusty_firrtl::Expr::Reference(rusty_firrtl::Reference::Ref(reset.clone()));
-    if rst_expr == reset_cond {
-      rusty_firrtl::Stmt::RegReset(name, tpe, clk, reset_cond, reset_val, info)
-    } else {
+    let reg_reference = rusty_firrtl::Expr::Reference(rusty_firrtl::Reference::Ref(name.clone()));
+    if reg_reference == reset_val {
+      let reset_cond_expect = rusty_firrtl::Expr::UIntInit(rusty_firrtl::Width(1), rusty_firrtl::Int::from(0));
+      assert_eq!(reset_cond, reset_cond_expect);
+
       rusty_firrtl::Stmt::Reg(name, tpe, clk, info)
+    } else {
+      rusty_firrtl::Stmt::RegReset(name, tpe, clk, reset_cond, reset_val, info)
     }
   },
   "reg" <name: Identifier> "symbol" <tpe: Type> "symbol" <clk: Expr> "with" "symbol" "indent" <reset: Identifier> "=>" "(" <reset_cond: Expr> "symbol" <reset_val: Expr> ")"              "dedent" => {
-    let rst_expr = rusty_firrtl::Expr::Reference(rusty_firrtl::Reference::Ref(reset.clone()));
-    if rst_expr == reset_cond {
-      rusty_firrtl::Stmt::RegReset(name, tpe, clk, reset_cond, reset_val, rusty_firrtl::Info::default())
-    } else {
+    let reg_reference = rusty_firrtl::Expr::Reference(rusty_firrtl::Reference::Ref(name.clone()));
+    if reg_reference == reset_val {
+      let reset_cond_expect = rusty_firrtl::Expr::UIntInit(rusty_firrtl::Width(1), rusty_firrtl::Int::from(0));
+      assert_eq!(reset_cond, reset_cond_expect);
+
       rusty_firrtl::Stmt::Reg(name, tpe, clk, rusty_firrtl::Info::default())
+    } else {
+      rusty_firrtl::Stmt::RegReset(name, tpe, clk, reset_cond, reset_val, rusty_firrtl::Info::default())
     }
   },
   <m: ChirrtlMemory> => rusty_firrtl::Stmt::ChirrtlMemory(m),
