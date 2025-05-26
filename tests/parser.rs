@@ -109,6 +109,7 @@ mem ram_flattened : @[src/main/scala/chisel3/util/Decoupled.scala 256:91]
      #[test_case("PointerChasing" ; "PointerChasing")]
      #[test_case("FireSimRocket" ; "FireSimRocket")]
      #[test_case("FireSimLargeBoom" ; "FireSimLargeBoom")]
+     #[test_case("FireSimQuadRocketFAME5" ; "FireSimQuadRocketFAME5")]
      fn run(name: &str) -> Result<(), std::io::Error> {
          let file = format!("./test-inputs/{}.fir", name);
          let source = std::fs::read_to_string(&file)?;
